@@ -11,6 +11,18 @@ ROOTFS_SIZE=`wc -c < rootfs.ubifs`
 # Fix the permissions on the "private" key, so ssh doesn't complain.
 chmod 700 keys/id_rsa
 
+echo "Leapster flash utility - installs a custom OS on your leapster!"
+echo
+echo "WARNING! This utility will ERASE the stock leapster OS and any other"
+echo "data on the device. The device can be restored to stock settings using"
+echo "the LeapFrog Connect app. Note that flashing your device will likely"
+echo "VOID YOUR WARRANTY! Proceed at your own risk."
+echo
+echo "Please power off your leapster, hold the L + R shoulder buttons, "
+echo "and then press power. You should see a screen with a green background."
+echo
+read -p "Press enter when you're ready to continue." 
+
 echo "Booting the Surgeon environment..."
 sudo python util.py
 
