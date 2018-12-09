@@ -18,9 +18,10 @@ echo "data on the device. The device can be restored to stock settings using"
 echo "the LeapFrog Connect app. Note that flashing your device will likely"
 echo "VOID YOUR WARRANTY! Proceed at your own risk."
 echo
-echo "Please power off your leapster, hold the L + R shoulder buttons, "
-echo "and then press power. You should see a screen with a green background."
-echo
+echo "Please power off your leapster, hold the L + R shoulder buttons (LeapsterGS), "
+echo "or right arrow + home buttons (LeapPad2), and then press power."
+echo "You should see a screen with a green background."
+
 read -p "Press enter when you're ready to continue." 
 
 echo "Booting the Surgeon environment..."
