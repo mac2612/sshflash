@@ -16,5 +16,5 @@ File can be any name, but must conform to CBF standards.
     print 'Booting surgeon.'
 
 
-cbf.create(mem='superhigh', opath='surgeon_wrap.cbf', ipath='zImage')
+cbf.create(mem='superhigh', opath='surgeon_wrap.cbf', ipath='surgeon_zImage')
 do_surgeon_boot('surgeon_wrap.cbf')
