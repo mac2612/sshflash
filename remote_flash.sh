@@ -25,7 +25,7 @@ echo "You should see a screen with a green background."
 read -p "Press enter when you're ready to continue." 
 
 echo "Booting the Surgeon environment..."
-sudo python util.py
+sudo python2 util.py
 
 echo "Waiting for Surgeon to come up..."
 sleep 10
