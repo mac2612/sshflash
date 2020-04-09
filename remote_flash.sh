@@ -28,7 +28,7 @@ echo "Booting the Surgeon environment..."
 sudo python2 util.py
 
 echo "Waiting for Surgeon to come up..."
-sleep 10
+sleep 15
 
 # For the first ssh command, skip hostkey checking to avoid prompting the user.
 ${SSH} -o "StrictHostKeyChecking no" 'test'
