@@ -30,16 +30,24 @@ sudo python2 util.py
 echo "Waiting for Surgeon to come up..."
 sleep 10
 
-echo "Flashing the kernel..."
 # For the first ssh command, skip hostkey checking to avoid prompting the user.
-${SSH} -o "StrictHostKeyChecking no" '/usr/sbin/flash_erase /dev/mtd1 0 0'
-cat uImage | ${SSH} '/usr/sbin/nandwrite -p /dev/mtd1 -'
+${SSH} -o "StrictHostKeyChecking no" 'test'
+
+# Probe for filesystem partition locations, they can vary based on kernel version + presence of NOR flash drivers.
+# TODO: Make the escaping less yucky...
+KERNEL_PARTITION=`${SSH} "awk -e '\\$4 ~ /\"Kernel\"/ {print \"/dev/\" substr(\\$1, 1, length(\\$1)-1)}' /proc/mtd"`
+RFS_PARTITION=`${SSH} "awk -e '\\$4 ~ /\"RFS\"/ {print \"/dev/\" substr(\\$1, 1, length(\\$1)-1)}' /proc/mtd"`
+echo "Detected Kernel partition=$KERNEL_PARTITION RFS Partition=$RFS_PARTITION"
+
+echo "Flashing the kernel..."
+${SSH} "/usr/sbin/flash_erase $KERNEL_PARTITION 0 0"
+cat uImage | ${SSH} "/usr/sbin/nandwrite -p $KERNEL_PARTITION -"
 
 echo "Flashing the root filesystem..."
-${SSH} '/usr/sbin/ubiformat -y /dev/mtd2'
-${SSH} '/usr/sbin/ubiattach -p /dev/mtd2'
+${SSH} "/usr/sbin/ubiformat -y $RFS_PARTITION"
+${SSH} "/usr/sbin/ubiattach -p $RFS_PARTITION"
 sleep 1
-${SSH} '/usr/sbin/ubimkvol /dev/ubi0 -N 2 -m'
+${SSH} "/usr/sbin/ubimkvol /dev/ubi0 -N RFS -m"
 sleep 1
 echo "Writing rootfs image ($ROOTFS_SIZE bytes)..."
 cat rootfs.ubifs | ${SSH} "/usr/sbin/ubiupdatevol -s $ROOTFS_SIZE /dev/ubi0_0 -"
