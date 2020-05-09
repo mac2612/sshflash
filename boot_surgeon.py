@@ -1,5 +1,6 @@
 import pager
 import cbf
+import sys
 from interface import config as conn_iface
 from mount import connection as mount_connection
 
@@ -16,5 +17,9 @@ File can be any name, but must conform to CBF standards.
     print 'Booting surgeon.'
 
 
-cbf.create(mem='superhigh', opath='surgeon_wrap.cbf', ipath='surgeon_zImage')
-do_surgeon_boot('surgeon_wrap.cbf')
+if len(sys.argv) != 2:
+  print("surgeon.py: Boot a surgeon kernel on a leapfrog device in surgeon mode")
+  print("Syntax: surgeon.py <surgeon_file>")
+  sys.exit(1)
+
+do_surgeon_boot(sys.argv[1])
