@@ -62,16 +62,21 @@ nand_flash_kernel () {
 nand_flash_rfs () {
   rfs_path=$1
   # Size of the rootfs to be flashed, in bytes.
-  rfs_size=`wc -c < $rfs_path`
   echo -n "Flashing the root filesystem..."
   ${SSH} "/usr/sbin/ubiformat -y $RFS_PARTITION"
   ${SSH} "/usr/sbin/ubiattach -p $RFS_PARTITION"
   sleep 1
   ${SSH} "/usr/sbin/ubimkvol /dev/ubi0 -N RFS -m"
   sleep 1
-  echo "Writing rootfs image ($rfs_size bytes)..."
-  cat $rfs_path | ${SSH} "/usr/sbin/ubiupdatevol -s $rfs_size /dev/ubi0_0 -"
-  sleep 1
+  # TODO: This should be part of the surgeon fsoverlay
+  ${SSH} "mkdir /mnt/root"
+  ${SSH} "mount -t ubifs /dev/ubi0_0 /mnt/root"
+  # Note: We used to use a ubifs image here, but now use a .tar.gz.
+  # This removes the need to care about PEB/LEB sizes at build time,
+  # which is important as some LF2000 models (Ultra XDi) have differing sizes.
+  echo "Writing rootfs image ($rfs_size bytes)..."  
+  cat $rfs_path | ${SSH} "gunzip -c | tar x -f '-' -C /mnt/root"
+  ${SSH} "umount /mnt/root"
   ${SSH} '/usr/sbin/ubidetach -d 0'
   sleep 3
   echo "Done flashing the root filesystem!"
@@ -84,7 +89,7 @@ flash_nand () {
   ${SSH} -o "StrictHostKeyChecking no" 'test'
   nand_part_detect
   nand_flash_kernel ${prefix}uImage
-  nand_flash_rfs ${prefix}rootfs.ubifs
+  nand_flash_rfs ${prefix}rootfs.tar.gz
   echo "Done! Rebooting the host."
   ${SSH} '/sbin/reboot'
 }
