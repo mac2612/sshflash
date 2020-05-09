@@ -94,6 +94,7 @@ flash_nand () {
   ${SSH} '/sbin/reboot'
 }
 
+show_warning
 prefix=$1
 if [ -z "$prefix" ]
 then
