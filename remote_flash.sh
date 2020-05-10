@@ -34,8 +34,9 @@ show_machinelist () {
 
 boot_surgeon () {
   surgeon_path=$1
+  memloc=$2
   echo "Booting the Surgeon environment..."
-  python2 make_cbf.py superhigh $surgeon_path surgeon_tmp.cbf
+  python2 make_cbf.py $memloc $surgeon_path surgeon_tmp.cbf
   sudo python2 boot_surgeon.py surgeon_tmp.cbf
   echo -n "Done! Waiting for Surgeon to come up..."
   rm surgeon_tmp.cbf
@@ -84,13 +85,59 @@ nand_flash_rfs () {
 
 flash_nand () {
   prefix=$1
-  boot_surgeon ${prefix}surgeon_zImage
+  if [ $prefix == "lf1000_" ]; then
+	  memloc="high"
+	  kernel="zImage_tmp.cbf"
+	  python2 make_cbf.py $memloc lf1000_zImage $kernel
+  else
+	  memloc="superhigh"
+	  kernel=${prefix}uImage
+  fi
+  boot_surgeon ${prefix}surgeon_zImage $memloc
   # For the first ssh command, skip hostkey checking to avoid prompting the user.
   ${SSH} -o "StrictHostKeyChecking no" 'test'
   nand_part_detect
-  nand_flash_kernel ${prefix}uImage
+  nand_flash_kernel $kernel
   nand_flash_rfs ${prefix}rootfs.tar.gz
   echo "Done! Rebooting the host."
+  ${SSH} '/sbin/reboot'
+}
+
+mmc_flash_kernel () {
+  kernel_path=$1
+  echo -n "Flashing the kernel..."
+  # TODO: This directory structure should be included in surgeon images.
+  ${SSH} "mkdir /mnt/boot"
+  # TODO: This assumes a specific partition layout - not sure if this is the case for all devices?
+  ${SSH} "mount /dev/mmcblk0p2 /mnt/boot"
+  cat $kernel_path | ${SSH} "cat - > /mnt/boot/uImage"
+  ${SSH} "umount /dev/mmcblk0p2"
+  echo "Done flashing the kernel!"
+}
+
+mmc_flash_rfs () {
+  rfs_path=$1
+  # Size of the rootfs to be flashed, in bytes.
+  echo -n "Flashing the root filesystem..."
+  ${SSH} "mkfs.ext4 -F -L RFS -O ^metadata_csum /dev/mmcblk0p3"
+  # TODO: This directory structure should be included in surgeon images.
+  ${SSH} "mkdir /mnt/root"
+  ${SSH} "mount -t ext4 /dev/mmcblk0p3 /mnt/root"
+  echo "Writing rootfs image..."  
+  cat $rfs_path | ${SSH} "gunzip -c | tar x -f '-' -C /mnt/root"
+  ${SSH} "umount /mnt/root"
+  echo "Done flashing the root filesystem!"
+}
+
+flash_mmc () {
+  prefix=$1
+  boot_surgeon ${prefix}surgeon_zImage superhigh
+  # For the first ssh command, skip hostkey checking to avoid prompting the user.
+  ${SSH} -o "StrictHostKeyChecking no" 'test'
+  mmc_flash_kernel ${prefix}uImage
+  mmc_flash_rfs ${prefix}rootfs.tar.gz
+  echo "Done! Rebooting the host."
+  sleep 3
   ${SSH} '/sbin/reboot'
 }
 
@@ -108,4 +155,8 @@ then
   esac
 fi
 
-flash_nand $prefix
+if [ $prefix == "lf3000_" ]; then
+	flash_mmc $prefix
+else
+        flash_nand $prefix
+fi
