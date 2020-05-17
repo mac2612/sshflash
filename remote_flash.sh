@@ -119,7 +119,7 @@ mmc_flash_rfs () {
   rfs_path=$1
   # Size of the rootfs to be flashed, in bytes.
   echo -n "Flashing the root filesystem..."
-  ${SSH} "mkfs.ext4 -F -L RFS -O ^metadata_csum /dev/mmcblk0p3"
+  ${SSH} "/sbin/mkfs.ext4 -F -L RFS -O ^metadata_csum /dev/mmcblk0p3"
   # TODO: This directory structure should be included in surgeon images.
   ${SSH} "mkdir /mnt/root"
   ${SSH} "mount -t ext4 /dev/mmcblk0p3 /mnt/root"
