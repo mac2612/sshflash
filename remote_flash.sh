@@ -94,7 +94,7 @@ nand_maybe_wipe_roms () {
 
 flash_nand () {
   prefix=$1
-  if [ $prefix == "lf1000_" ]; then
+  if [[ $prefix == lf1000_* ]]; then
 	  memloc="high"
 	  kernel="zImage_tmp.cbf"
 	  python2 make_cbf.py $memloc lf1000_zImage $kernel
