@@ -63,7 +63,6 @@ nand_flash_kernel () {
 
 nand_flash_rfs () {
   rfs_path=$1
-  # Size of the rootfs to be flashed, in bytes.
   echo -n "Flashing the root filesystem..."
   ${SSH} "/usr/sbin/ubiformat -y $RFS_PARTITION"
   ${SSH} "/usr/sbin/ubiattach -p $RFS_PARTITION"
@@ -74,7 +73,7 @@ nand_flash_rfs () {
   # Note: We used to use a ubifs image here, but now use a .tar.gz.
   # This removes the need to care about PEB/LEB sizes at build time,
   # which is important as some LF2000 models (Ultra XDi) have differing sizes.
-  echo "Writing rootfs image ($rfs_size bytes)..."  
+  echo "Writing rootfs image..."  
   cat $rfs_path | ${SSH} "gunzip -c | tar x -f '-' -C /mnt/root"
   ${SSH} "umount /mnt/root"
   ${SSH} '/usr/sbin/ubidetach -d 0'
