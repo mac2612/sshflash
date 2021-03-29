@@ -27,7 +27,8 @@ show_machinelist () {
   echo "----------------------------------------------------------------"
   echo "What type of system would you like to flash?"
   echo
-  echo "1. LF1000 (Didj and Leapster Explorer)"
+  echo "1. LF1000-Didj (Didj with EmeraldBoot)"
+  echo "1. LF1000 (Leapster Explorer)"
   echo "2. LF2000 (Leapster GS, LeapPad 2, LeapPad Ultra XDI)"
   echo "3. LF3000 (LeapPad 3, LeapPad Platinum)"
 }
@@ -158,10 +159,11 @@ then
   show_machinelist
   read -p "Enter choice (1 - 3)" choice
   case $choice in
-    1) prefix="lf1000_" ;;
-    2) prefix="lf2000_" ;;
-    3) prefix="lf3000_" ;;
-    *) echo -e "Unkown choice!" && sleep 2
+    1) prefix="lf1000_didj_" ;;
+    2) prefix="lf1000_" ;;
+    3) prefix="lf2000_" ;;
+    4) prefix="lf3000_" ;;
+    *) echo -e "Unknown choice!" && sleep 2
   esac
 fi
 
