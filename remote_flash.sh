@@ -69,8 +69,6 @@ nand_flash_rfs () {
   sleep 1
   ${SSH} "/usr/sbin/ubimkvol /dev/ubi0 -N RFS -m"
   sleep 1
-  # TODO: This should be part of the surgeon fsoverlay
-  ${SSH} "mkdir /mnt/root"
   ${SSH} "mount -t ubifs /dev/ubi0_0 /mnt/root"
   # Note: We used to use a ubifs image here, but now use a .tar.gz.
   # This removes the need to care about PEB/LEB sizes at build time,
@@ -81,6 +79,17 @@ nand_flash_rfs () {
   ${SSH} '/usr/sbin/ubidetach -d 0'
   sleep 3
   echo "Done flashing the root filesystem!"
+}
+
+nand_maybe_wipe_roms () {
+  read -p "Do you want to format the roms partition? (You should do this on the first flash of retroleap) (y/n)" -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    ${SSH} /usr/sbin/ubiformat /dev/mtd3
+    ${SSH} /usr/sbin/ubiattach -p /dev/mtd3
+    ${SSH} /usr/sbin/ubimkvol /dev/ubi0 -m -N roms
+  fi
 }
 
 flash_nand () {
@@ -99,6 +108,7 @@ flash_nand () {
   nand_part_detect
   nand_flash_kernel $kernel
   nand_flash_rfs ${prefix}rootfs.tar.gz
+  nand_maybe_wipe_roms 
   echo "Done! Rebooting the host."
   ${SSH} '/sbin/reboot'
 }
