@@ -28,9 +28,9 @@ show_machinelist () {
   echo "What type of system would you like to flash?"
   echo
   echo "1. LF1000-Didj (Didj with EmeraldBoot)"
-  echo "1. LF1000 (Leapster Explorer)"
-  echo "2. LF2000 (Leapster GS, LeapPad 2, LeapPad Ultra XDI)"
-  echo "3. LF3000 (LeapPad 3, LeapPad Platinum)"
+  echo "2. LF1000 (Leapster Explorer)"
+  echo "3. LF2000 (Leapster GS, LeapPad 2, LeapPad Ultra XDI)"
+  echo "4. LF3000 (LeapPad 3, LeapPad Platinum)"
 }
 
 boot_surgeon () {
