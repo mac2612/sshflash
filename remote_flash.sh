@@ -97,7 +97,7 @@ flash_nand () {
   if [[ $prefix == lf1000_* ]]; then
 	  memloc="high"
 	  kernel="zImage_tmp.cbf"
-	  python2 make_cbf.py $memloc lf1000_zImage $kernel
+	  python2 make_cbf.py $memloc ${prefix}zImage $kernel
   else
 	  memloc="superhigh"
 	  kernel=${prefix}uImage
