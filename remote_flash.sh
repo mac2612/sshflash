@@ -3,10 +3,7 @@
 # We use a public/private keypair to authenticate. 
 # Surgeon uses the 169.254.8.X subnet to differentiate itself from
 # a fully booted system for safety purposes.
-SSH="ssh -i keys/id_rsa root@169.254.8.1"
-
-# Fix the permissions on the "private" key, so ssh doesn't complain.
-chmod 700 keys/id_rsa
+SSH="ssh root@169.254.8.1"
 
 show_warning () {
   echo "Leapster flash utility - installs a custom OS on your leapster!"
