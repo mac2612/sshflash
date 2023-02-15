@@ -5,3 +5,4 @@
 *_rootfs.tar.gz
 *_uImage
 *_zImage
+*.cbf
