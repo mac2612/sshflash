@@ -27,7 +27,8 @@ show_machinelist () {
   echo "1. LF1000-Didj (Didj with EmeraldBoot)"
   echo "2. LF1000 (Leapster Explorer)"
   echo "3. LF2000 (Leapster GS, LeapPad 2, LeapPad Ultra XDI)"
-  echo "4. LF3000 (LeapPad 3, LeapPad Platinum)"
+  echo "4. [EXPERIMENTAL] LF2000 w/ RT+OC Kernel (Leapster GS, LeapPad 2, LeapPad Ultra XDI)"
+  echo "5. LF3000 (LeapPad 3, LeapPad Platinum)"
 }
 
 boot_surgeon () {
@@ -158,7 +159,8 @@ then
     1) prefix="lf1000_didj_" ;;
     2) prefix="lf1000_" ;;
     3) prefix="lf2000_" ;;
-    4) prefix="lf3000_" ;;
+    4) prefix="lf2000_rt_" ;;
+    5) prefix="lf3000_" ;;
     *) echo -e "Unknown choice!" && sleep 2
   esac
 fi
