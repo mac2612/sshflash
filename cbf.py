@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ##############################################################################
 #    OpenLFConnect
 #
@@ -31,6 +31,8 @@
 
 #@
 # cbf.py Version 0.1.2
+# Ported to Python 3 by A.Mccarthy
+#
 
 import os
 import array
@@ -45,8 +47,9 @@ import struct
 ##############################
 
 PACKET_SIZE = 16384
-MAGIC_NUMBER = '\xf0\xde\xbc\x9a'
-COMPRESSION_SIG = '\x1F\x8B\x08\x00' #gunzip
+MAGIC_NUMBER = b'\xf0\xde\xbc\x9a'
+# MAGIC_NUMBER = struct.pack('IIII', 240, 222, 188, 154)
+COMPRESSION_SIG = b'\x1F\x8B\x08\x00' #gunzip
 CBF_VERSION = 1
 BLOCK_SIZE = 0x20000
 KERNEL_LOAD_08 = 0x8000
@@ -59,7 +62,6 @@ KERNEL_JUMP_28 = KERNEL_LOAD_28
 def error(e):
 	assert False, e
 
-
 def check(path, ret_bool=False):
 	try:
 		if not os.path.exists(path):
@@ -71,11 +73,12 @@ def check(path, ret_bool=False):
 			magic = f.read(4)
 			f.close()
 			
-			if not str(file_size/PACKET_SIZE).isdigit():
+			# if not str(file_size/PACKET_SIZE).isdigit():
+			if (file_size % PACKET_SIZE) != 0:
 				if ret_bool:
 					return False
 				else:
-					error('File is the wrong size, should be multiple of %s.' % PACKET_SIZE)
+					error('File is the wrong size, should be multiple of %s.' % str(file_size/PACKET_SIZE))
 
 			if magic != MAGIC_NUMBER:
 				if ret_bool:
@@ -84,7 +87,7 @@ def check(path, ret_bool=False):
 					error('File failed CBF Magic Number check.')
 			else:
 				return True
-	except Exception, e:
+	except Exception as e:
 		error(e)
 
 
@@ -100,12 +103,12 @@ def extract(path):
 
 	kernel_path = os.path.join(os.path.dirname(path), kernel_name)
 	
-	print 'Unwrapping Kernel from CBF'
+	print('Unwrapping Kernel from CBF')
 
 	fimg = open(kernel_path, 'wb')
 	fimg.write(image)
 	fimg.close()
-	print 'Saved as: %s' % kernel_name
+	print('Saved as: %s' % kernel_name)
 
 
 def create(mem, opath, ipath):
@@ -123,7 +126,7 @@ def create(mem, opath, ipath):
 			error('No output file selected')
 
 		if not os.path.exists(ipath):
-			error('Path does not exist.')
+			error('CBF: Path does not exist.')
 		elif os.path.isdir(ipath):
 			error('Path is not a file.')
 		elif 'zImage' not in image_name and 'Image' not in image_name:
@@ -138,7 +141,7 @@ def create(mem, opath, ipath):
 		p = packer(mem, opath, ipath)
 		p.pack()
 		summary(os.path.join(image_path, opath))
-	except Exception, e:
+	except Exception as e:
 		error(e)
 
 
@@ -147,16 +150,16 @@ def summary(path):
 	p = parse(path)
 	p.create_summary()
 
-	print 'CBF File Summary:'
+	print('CBF File Summary:')
 	
-	for k,v in p.summary.iteritems():
+	for k,v in p.summary.items():
 		if len(k) < 7:
 			tab = '\t\t'
 		else:
 			tab = '\t'
-		print '%s:%s0x%08x' % (k,tab,v)
+		print('%s:%s0x%08x' % (k,tab,v))
 		
-	print 'Compressed: \t %s' % p.is_compressed
+	print('Compressed: \t %s' % p.is_compressed)
 
 
 
@@ -210,7 +213,7 @@ class parse(object):
 	
 			f.close()
 			return image
-		except Exception, e:
+		except Exception as e:
 			self.error(e)
 
 
@@ -220,15 +223,14 @@ class packer(object):
 	def __init__(self, mem, opath, ipath):
 		self._in_path = ipath
 		self._out_path = opath
-		self._summary = ''
-		self._summary_crc = ''
-		self._buffer = ''
-		self._buffer_crc = ''
+		self._summary = b''
+		self._summary_crc = b''
+		self._buffer = b''
+		self._buffer_crc = b''
 		self._size = 0 
-		
-                if mem.lower() == 'superhigh':
-                        self._kernel_jump = KERNEL_JUMP_28
-                        self._kernel_load = KERNEL_LOAD_28
+		if mem.lower() == 'superhigh':
+			self._kernel_jump = KERNEL_JUMP_28
+			self._kernel_load = KERNEL_LOAD_28
 		elif mem.lower() == 'high':
 			self._kernel_jump = KERNEL_JUMP_10
 			self._kernel_load = KERNEL_LOAD_10
@@ -266,19 +268,21 @@ class packer(object):
 
 			rem = buf_len % BLOCK_SIZE
 			pad_len = 0
+			padding = b''
 			
 			if rem != 0:
 				pad_len = BLOCK_SIZE - rem
 				
-			padding = pad_len * '\xFF'
+			padding = pad_len * b'\xFF'
+			
 			buf += padding
-			print 'Writing CBF file.'
+			print('Writing CBF file.')
 			f = open(self._out_path, 'wb')
 			f.write(buf)
 			f.close()
 			
 			
-		except Exception, e:
+		except Exception as e:
 			error(e)
 
 
@@ -303,9 +307,7 @@ class packer(object):
 		self._summary = MAGIC_NUMBER
 		self._summary += struct.pack('IIII', CBF_VERSION, self._kernel_load, self._kernel_jump, self._size)
 		self._summary_crc = self.crc(self._summary)
-		self._summary += struct.pack('I', self._summary_crc)		
-		
+		self._summary += struct.pack('I', self._summary_crc)
+
 if __name__ == '__main__':
-	print 'No examples yet.'
-
-
+	print('No examples yet.')

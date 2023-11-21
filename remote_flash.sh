@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # We use a public/private keypair to authenticate. 
 # Surgeon uses the 169.254.8.X subnet to differentiate itself from
@@ -35,8 +35,8 @@ boot_surgeon () {
   surgeon_path=$1
   memloc=$2
   echo "Booting the Surgeon environment..."
-  python2 make_cbf.py $memloc $surgeon_path surgeon_tmp.cbf
-  sudo python2 boot_surgeon.py surgeon_tmp.cbf
+  python3 make_cbf.py $memloc $surgeon_path surgeon_tmp.cbf
+  sudo python3 boot_surgeon.py surgeon_tmp.cbf
   echo -n "Done! Waiting for Surgeon to come up..."
   rm surgeon_tmp.cbf
   sleep 15
@@ -95,7 +95,7 @@ flash_nand () {
   if [[ $prefix == lf1000_* ]]; then
 	  memloc="high"
 	  kernel="zImage_tmp.cbf"
-	  python2 make_cbf.py $memloc ${prefix}zImage $kernel
+	  python3 make_cbf.py $memloc ${prefix}zImage $kernel
   else
 	  memloc="superhigh"
 	  kernel=${prefix}uImage

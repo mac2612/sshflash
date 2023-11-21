@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ##############################################################################
 #    OpenLFConnect
 #
@@ -31,6 +31,8 @@
 
 #@
 # pager.py Version 0.7
+# Ported to Python 3 by A.McCarthy
+
 import os
 import sys
 import struct
@@ -73,20 +75,27 @@ class client(object):
                 self.error('Surgeon not found.')
                     
             cbf.check(path)
-            buf = ''
+            buf = b''
+            packets = 0
+            
             with open(path, 'rb') as f:
                 buf = f.read()
                 f.close()
 
             buf_len = len(buf)
+            
 
             packet_leftovers = buf_len % cbf.PACKET_SIZE
+            
             if packet_leftovers > 0:
                 padding_size = cbf.PACKET_SIZE - packet_leftovers
-                buf += struct.pack('%ss' % padding_size, '\xFF'*padding_size)
+                buf += struct.pack('%ss' % padding_size, b'\xFF'*padding_size)
 
             buf_len = len(buf)
-            packets = buf_len/cbf.PACKET_SIZE
+
+            # Use of int function - should be ok as already checked in cbf to ensure buffer/packet size = whole number
+            packets = int(buf_len/cbf.PACKET_SIZE)
+            print(packets)
 
             byte1 = '00'
             total = 0
@@ -96,9 +105,10 @@ class client(object):
                 cmdl = '%s %s -b -s %s -n 2A 00 00 00 00 %s 00 00 20 00' % (self._sg_raw, self._mount_config.device_id, cbf.PACKET_SIZE, byte1)
                 cmd = shlex_split(cmdl)
                 byte1 = '01'
+                #print(cmd)
                 p = Popen(cmd, stdin=PIPE, stderr=PIPE)
                 p.stdin.write(buf[last_total:last_total+cbf.PACKET_SIZE])
-                err = p.stderr.read()
+                err = str(p.stderr.read(), 'utf-8')
                 
                 if not 'Good' in err:
                     self.error('SCSI error.')
@@ -110,15 +120,9 @@ class client(object):
             
             if len(err) != 0:
                 self.error('SCSI error.')                
-        except Exception, e:
+        except Exception as e:
             self.rerror(e)
 
 
 if __name__ == '__main__':
-    print 'No examples yet.'
-        
-
-
-
-
-    
+    print('No examples yet.')
