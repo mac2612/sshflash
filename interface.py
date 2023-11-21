@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ##############################################################################
 #    OpenLFConnect
 #
@@ -31,6 +31,8 @@
 
 #@
 # services/interface.py Version 0.5
+# Ported to Python 3 by A.McCarthy
+
 class config(object):
     def __init__(self, connection):
         self._connection = connection
@@ -47,7 +49,7 @@ class config(object):
     def get_device_id(self):
         try:
             return self._connection.get_device_id_i()
-        except Exception, e:
+        except Exception as e:
             self._connection.rerror(e)
 
     device_id = property(get_device_id)
@@ -57,7 +59,7 @@ class config(object):
     def get_host_id(self):
         try:
             return self._connection.get_host_id_i()
-        except Exception, e:
+        except Exception as e:
             self._connection.rerror(e)
             
     host_id = property(get_host_id)
@@ -66,8 +68,8 @@ class config(object):
     def is_connected(self):
         try:
             return self._connection.is_connected_i()
-        except Exception, e:
+        except Exception as e:
             self._connection.rerror(e)
 
 if __name__ == '__main__':
-    print 'No examples yet.'
+    print('No examples yet.')

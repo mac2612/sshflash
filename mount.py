@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ##############################################################################
 #    OpenLFConnect
 #
@@ -31,6 +31,8 @@
 
 #@
 # mount.py Version 0.5.2
+# Ported to Python 3 by A.McCarthy
+
 import os
 import re
 import sys
@@ -114,13 +116,13 @@ class connection(object):
             if not err:
                 ret = p.stdout.read()
                 
-                if self._vendor_name in ret.lower():
+                if self._vendor_name in str(ret.lower(), 'utf-8'):
                     return ret
                 else:
                     return ''
             else:
                 return ''
-        except Exception, e:
+        except Exception as e:
             self.error(e)
 
 
@@ -131,7 +133,7 @@ class connection(object):
 
             while time_out:
                 if sys.platform == 'win32':
-                    lines = self.sg_scan().split('\n')
+                    lines = str(self.sg_scan(), 'utf-8').split('\n')
                     if lines:
                         for line in lines:
                             if self._vendor_name in line.lower():
@@ -168,7 +170,7 @@ class connection(object):
                 time_out -= 1
                 sleep(1)
             self.error('Device not found.')
-        except Exception, e:
+        except Exception as e:
             self.error(e)
 
 
@@ -211,7 +213,7 @@ class connection(object):
                 sleep(1)
                 timeout -= 1
             self.error('Mount not found.')
-        except Exception, e:
+        except Exception as e:
             self.error(e)
 
 
@@ -228,7 +230,7 @@ class connection(object):
     def get_device_id_i(self):
         try:
             return self._device_id or self.find_device_id()
-        except Exception, e:
+        except Exception as e:
             self.error(e)
 
 
@@ -236,7 +238,7 @@ class connection(object):
     def get_host_id_i(self):
         try:
             return self._mount_point or self.find_mount_point()
-        except Exception, e:
+        except Exception as e:
             self.error(e)
 
 
@@ -244,8 +246,8 @@ class connection(object):
     def is_connected_i(self):
         try:
             return os.path.exists(self._mount_point)
-        except Exception, e:
+        except Exception as e:
             self.error(e)
 
 if __name__ == '__main__':
-    print 'No examples yet.'
+    print('No examples yet.')
